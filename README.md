@@ -2,6 +2,10 @@
 
 # moleculer-cqrs
 
+```
+GET localhost:3000/api/news/read-model aggregateId=873b97b6-2db9-4b1d-8938-6b23ae141eec
+```
+
 ## NPM scripts
 
 - `npm run dev`: Start development mode (load all services locally with hot-reload & REPL)

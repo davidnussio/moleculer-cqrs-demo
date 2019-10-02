@@ -22,14 +22,14 @@ services:
     networks:
       - internal
 
-  greeter:
+  viewModels:
     build:
       context: .
     image: moleculer-cqrs
     container_name: moleculer-cqrs-greeter
     env_file: docker-compose.env
     environment:
-      SERVICES: greeter
+      SERVICES: news-list,user-list
     labels:
       - "traefik.enable=false"
     depends_on:

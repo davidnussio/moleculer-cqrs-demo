@@ -1,14 +1,6 @@
-"use strict";
-
-const EventSourceStorage = require("../event-source-storage");
-const CQRSEventSource = require("../mixins/CQRSEventSource");
-
 module.exports = {
-  name: "user",
+  name: "events",
 
-  mixins: [CQRSEventSource({ aggregatesDir: "../aggregates" })],
-
-  storage: EventSourceStorage,
   /**
    *
    * Service settings
@@ -29,20 +21,24 @@ module.exports = {
      *
      * @param {String} name - User name
      */
-    welcome: {
-      params: {
-        name: "string"
-      },
-      handler(ctx) {
-        return `Welcome, ${ctx.params.name}`;
-      }
+    welcome() {
+      return `Welcome, events`;
     }
   },
 
   /**
    * Events
    */
-  events: {},
+  events: {
+    "*": function(payload) {
+      this.logger.info(
+        "Event received type:",
+        payload.type,
+        " payload size: ",
+        JSON.stringify(payload, "", 0).length
+      );
+    }
+  },
 
   /**
    * Methods
