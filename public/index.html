@@ -9,8 +9,19 @@
 	<img src="banner.png" />
 	<h1>Services</h1>
 	<ul>
-		<li><a href="/api/greeter/hello"><code>/api/greeter/hello</code></a></li>
-		<li><a href="/api/greeter/welcome?name=John"><code>/api/greeter/welcome?name=John</code></a></li>
+		<li><a target="_blank" href="/api/$node.services"><code>/api/$node.services</code></a></li>
+		<li><a target="_blank" href="/api/$node.actions"><code>/api/$node.actions</code></a></li>
+		<li><a target="_blank" href="/api/$node.events"><code>/api/$node.events</code></a></li>
+		<li><a target="_blank" href="/api/$node.health"><code>/api/$node.health</code></a></li>
+		<li><a target="_blank" href="/api/$node.options"><code>/api/$node.options</code></a></li>
+		<li><code>----------------------------------------------------------------</code></li>
+		<li><a target="_blank" href="/api/news-list"><code>/api/news-list</code></a></li>
+		<li><a target="_blank" href="/api/user-list"><code>/api/user-list</code></a></li>
 	</ul>
+	<pre>
+call {{aggregateName}}.command '{"aggregateId": "uuid-abcd-1234", "aggregateName": "patient", "type": "create{{aggregateName}}", "payload": { "title": "Title...", "userId": "uuid-zzz-yyy"} }'
+
+call eventsource.replay '{"viewModels":["news-list"]}'
+	</pre>
 </body>
 </html>

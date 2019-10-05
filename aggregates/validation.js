@@ -1,7 +1,5 @@
 const Validator = require("fastest-validator");
 
-// const logger = require("../../logger");
-
 class ValidationError extends Error {
   constructor(message, cause) {
     super(message);
@@ -19,7 +17,10 @@ module.exports = function validate(object, schema) {
     return true;
   }
 
-  // logger.error(object);
+  const messages = result.map(({ message }) => message).join("\n 🔥 ");
 
-  throw new ValidationError("Aggregate validation error", result);
+  throw new ValidationError(
+    `Aggregate validation error 😭\n🔥  ${messages}`,
+    result
+  );
 };

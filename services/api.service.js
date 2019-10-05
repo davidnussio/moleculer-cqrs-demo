@@ -14,47 +14,58 @@ module.exports = {
         path: "/api",
         aliases: {
           "POST command-handler": async function(req, res) {
+            console.log(req.$params);
             await this.broker.call(
               `${req.$params.aggregateName}.command`,
               req.$params
             );
             res.end("Command handler dipatched");
           },
-          "GET news-list": "news-list.mapReq"
+          // "GET news-list": "news-list.mapReq",
+          // "GET user-list": "user-list.mapReq",
         },
         whitelist: [
           // Access to any actions in all services under "/api" URL
-          "**"
-        ]
-      }
+          "**",
+        ],
+      },
     ],
 
     // Serve assets from "public" folder
     assets: {
-      folder: "public"
-    }
+      folder: "public",
+    },
   },
 
   events: {
-    "**": function(payload, sender, event) {
-      if (this.io)
-        this.io.emit("event", {
+    "view-model.**": function(payload, sender, event) {
+      // this.logger.info("event → payload", sender, event);
+      if (this.io) {
+        this.io.emit("server.event", {
           sender,
           event,
-          payload
+          payload,
         });
-    }
+        this.io.emit(event, {
+          sender,
+          event,
+          payload,
+        });
+      }
+    },
   },
 
   started() {
     // Create a Socket.IO instance, passing it our server
-    this.io = IO.listen(this.server);
+    this.io = IO({ path: "/api/socket.io" });
+    this.io.attach(this.server);
+    // this.io.path
     // Add a connect listener
-    this.io.on("socket.io", client => {
+    this.io.on("connection", client => {
       this.logger.info("Client connected via websocket!");
 
       client.on("call", ({ action, params, opts }, done) => {
-        this.logger.info(
+        this.logger.debug(
           "Received request from client! Action:",
           action,
           ", Params:",
@@ -73,5 +84,5 @@ module.exports = {
         this.logger.info("Client disconnected");
       });
     });
-  }
+  },
 };

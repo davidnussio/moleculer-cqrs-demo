@@ -1,5 +1,7 @@
 const validate = require("../validation");
-const { CREATED, DELETED, BLOCKED, ELECTED } = require("./event_types");
+const {
+  types: { CREATED, DELETED, BLOCKED, ELECTED },
+} = require("./events");
 
 function createUser(state, command) {
   validate(state, { createdAt: { type: "forbidden" } });
@@ -8,9 +10,9 @@ function createUser(state, command) {
       type: "object",
       props: {
         username: { type: "string", min: "4" },
-        email: { type: "email" }
-      }
-    }
+        email: { type: "email" },
+      },
+    },
   });
 
   const { username, email, privileges } = command.payload;
@@ -21,8 +23,8 @@ function createUser(state, command) {
       username,
       email,
       privileges,
-      createdAt: Date.now()
-    }
+      createdAt: Date.now(),
+    },
   };
 }
 
@@ -30,19 +32,19 @@ function deleteUser(state) {
   validate(state, {
     createdAt: {
       type: "any",
-      messages: { required: "Aggregate does not exist" }
+      messages: { required: "Aggregate does not exist" },
     },
     removedAt: {
       type: "forbidden",
-      messages: { forbidden: "Aggregate is already deleted" }
-    }
+      messages: { forbidden: "Aggregate is already deleted" },
+    },
   });
 
   return {
     type: DELETED,
     payload: {
-      removedAt: Date.now()
-    }
+      removedAt: Date.now(),
+    },
   };
 }
 
@@ -50,19 +52,19 @@ function blockUser(state) {
   validate(state, {
     createdAt: {
       type: "any",
-      messages: { required: "Aggregate does not exist" }
+      messages: { required: "Aggregate does not exist" },
     },
     removedAt: {
       type: "forbidden",
-      messages: { forbidden: "Aggregate is already deleted" }
-    }
+      messages: { forbidden: "Aggregate is already deleted" },
+    },
   });
 
   return {
     type: BLOCKED,
     payload: {
-      blockedAt: Date.now()
-    }
+      blockedAt: Date.now(),
+    },
   };
 }
 
@@ -70,21 +72,21 @@ function electUser(state, command) {
   validate(state, {
     createdAt: {
       type: "any",
-      messages: { required: "Aggregate does not exist" }
+      messages: { required: "Aggregate does not exist" },
     },
     removedAt: {
       type: "forbidden",
-      messages: { forbidden: "Aggregate is already deleted" }
-    }
+      messages: { forbidden: "Aggregate is already deleted" },
+    },
   });
 
   validate(command, {
     payload: {
       type: "object",
       props: {
-        privileges: { type: "arrayEmpty" }
-      }
-    }
+        privileges: { type: "arrayEmpty" },
+      },
+    },
   });
 
   const { privileges } = command.payload;
@@ -92,8 +94,8 @@ function electUser(state, command) {
   return {
     type: ELECTED,
     payload: {
-      privileges
-    }
+      privileges,
+    },
   };
 }
 
@@ -101,5 +103,5 @@ module.exports = {
   createUser,
   deleteUser,
   blockUser,
-  electUser
+  electUser,
 };

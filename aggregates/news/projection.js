@@ -1,28 +1,34 @@
 const {
-  CREATED,
-  DELETED,
-  UPVOTED,
-  UNVOTED,
-  COMMENT_CREATED,
-  COMMENT_REMOVED
-} = require("./event_types");
+  types: {
+    CREATED,
+    DELETED,
+    UPVOTED,
+    UNVOTED,
+    COMMENT_CREATED,
+    COMMENT_REMOVED,
+  },
+} = require("./events");
 
 module.exports = {
   Init: () => ({}),
   [CREATED]: (state, { payload }) => ({
     ...state,
-    ...payload
+    ...payload,
   }),
 
   [UPVOTED]: (state, { payload: { userId } }) => ({
     ...state,
-    voted: [...state.voted, userId]
+    votes: [...state.votes, userId],
   }),
 
-  [UNVOTED]: (state, { payload: { userId } }) => ({
-    ...state,
-    voted: [...state.voted.filter(votedUserId => votedUserId !== userId)]
-  }),
+  [UNVOTED]: (state, { payload: { userId } }) => {
+    const votes = [...state.votes];
+    votes.splice(votes.lastIndexOf(userId), 1);
+    return {
+      ...state,
+      votes,
+    };
+  },
 
   [COMMENT_CREATED]: (
     state,
@@ -34,21 +40,21 @@ module.exports = {
       [commentId]: {
         createdAt,
         createdBy,
-        comment
-      }
-    }
+        comment,
+      },
+    },
   }),
 
   [COMMENT_REMOVED]: (state, { payload: { commentId } }) => {
     const { [commentId]: _, ...comments } = state.comments;
     return {
       ...state,
-      comments
+      comments,
     };
   },
 
   [DELETED]: (state, { payload }) => ({
     ...state,
-    removedAt: payload.removedAt
-  })
+    removedAt: payload.removedAt,
+  }),
 };

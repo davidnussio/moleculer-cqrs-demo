@@ -1,13 +1,13 @@
 const projection = require("./projection");
 const commands = require("./commands");
-const eventTypes = require("./event_types");
+const events = require("./events");
 
 module.exports = {
   name: "news",
   projection,
   commands,
-  eventTypes,
+  events,
   invariantHash: null,
   serializeState: state => JSON.stringify(state),
-  deserializeState: serializedState => JSON.parse(serializedState)
+  deserializeState: serializedState => JSON.parse(serializedState),
 };

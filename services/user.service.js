@@ -1,12 +1,11 @@
-"use strict";
-
 const EventSourceStorage = require("../event-source-storage");
-const CQRSEventSource = require("../mixins/CQRSEventSource");
+const CQRSEventSource = require("../mixins/cqrs-event-source");
+const aggregate = require("../aggregates/user");
 
 module.exports = {
   name: "user",
 
-  mixins: [CQRSEventSource({ aggregatesDir: "../aggregates" })],
+  mixins: [CQRSEventSource({ aggregate })],
 
   storage: EventSourceStorage,
   /**
@@ -23,21 +22,7 @@ module.exports = {
   /**
    * Actions
    */
-  actions: {
-    /**
-     * Welcome a username
-     *
-     * @param {String} name - User name
-     */
-    welcome: {
-      params: {
-        name: "string"
-      },
-      handler(ctx) {
-        return `Welcome, ${ctx.params.name}`;
-      }
-    }
-  },
+  actions: {},
 
   /**
    * Events
@@ -62,5 +47,5 @@ module.exports = {
   /**
    * Service stopped lifecycle event handler
    */
-  stopped() {}
+  stopped() {},
 };

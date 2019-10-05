@@ -1,5 +1,8 @@
 const {
-  types: { CREATED, DELETED },
+  types: {
+    CREATED,
+    DELETED,
+  },
 } = require("./events");
 
 module.exports = {
@@ -11,6 +14,6 @@ module.exports = {
 
   [DELETED]: (state, { payload }) => ({
     ...state,
-    removedAt: payload.removedAt,
+    ...payload,
   }),
 };

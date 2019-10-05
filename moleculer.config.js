@@ -51,7 +51,7 @@ module.exports = {
     // Backoff factor for delay. 2 means exponential backoff.
     factor: 2,
     // A function to check failed requests.
-    check: err => err && !!err.retryable
+    check: err => err && !!err.retryable,
   },
 
   // Limit of calling level. If it reaches the limit, broker will throw an MaxCallLevelError error. (Infinite loop protection)
@@ -67,7 +67,7 @@ module.exports = {
     // Enable feature
     enabled: false,
     // Number of milliseconds to wait before shutdowning the process
-    shutdownTimeout: 5000
+    shutdownTimeout: 5000,
   },
 
   // Disable built-in request & emit balancer. (Transporter must support it, as well.)
@@ -79,7 +79,7 @@ module.exports = {
     // Available values: "RoundRobin", "Random", "CpuUsage", "Latency"
     strategy: "RoundRobin",
     // Enable local action call preferring.
-    preferLocal: true
+    preferLocal: true,
   },
 
   // Settings of Circuit Breaker. More info: https://moleculer.services/docs/0.13/fault-tolerance.html#Circuit-Breaker
@@ -95,7 +95,7 @@ module.exports = {
     // Number of milliseconds to switch from open to half-open state
     halfOpenTime: 10 * 1000,
     // A function to check failed requests.
-    check: err => err && err.code >= 500
+    check: err => err && err.code >= 500,
   },
 
   // Settings of bulkhead feature. More info: https://moleculer.services/docs/0.13/fault-tolerance.html#Bulkhead
@@ -105,7 +105,7 @@ module.exports = {
     // Maximum concurrent executions.
     concurrency: 10,
     // Maximum size of queue
-    maxQueueSize: 100
+    maxQueueSize: 100,
   },
 
   // Enable parameters validation. More info: https://moleculer.services/docs/0.13/validating.html
@@ -139,5 +139,5 @@ module.exports = {
   stopped(/* broker */) {},
 
   // Register custom REPL commands.
-  replCommands: registeredCommand
+  replCommands: registeredCommand,
 };

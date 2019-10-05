@@ -1,5 +1,7 @@
 const DbService = require("moleculer-db");
 
+const { events: eventUser } = require("../aggregates/user");
+
 module.exports = {
   name: "user-list",
 
@@ -7,14 +9,18 @@ module.exports = {
 
   adapter: new DbService.MemoryAdapter({ filename: "./data/user-list.nedb" }),
 
-  // mixins: [CQRSEventSource({ aggregatesDir: "../aggregates" })],
+  metadata: {
+    viewModel: true,
+  },
 
   // storage: EventSourceStorage,
   /**
    *
    * Service settings
    */
-  settings: { fields: ["_id", "title", "voted", "comments"] },
+  settings: {
+    fields: ["_id", "username", "email", "createdAt"],
+  },
 
   /**
    * Service dependencies
@@ -25,39 +31,45 @@ module.exports = {
    * Actions
    */
   actions: {
-    /**
-     * Welcome a username
-     *
-     * @param {String} name - User name
-     */
-    async mapReq(ctx) {
-      this.logger.info(ctx.params, ctx.query);
-      await this.actions.create({
-        _id: Date.now(),
-        title: "fdiof",
-        voted: 6,
-        comments: 100
-      });
-      return { data: await this.actions.find() };
-    }
+    async dispose() {
+      this.broker.broadcast("user-list/disposed");
+      return this.adapter.removeMany({});
+    },
   },
 
   /**
    * Events
    */
   events: {
-    "user/created": function(/* event */) {
-      // this.logger.info("ok...", event.type);
+    [eventUser.types.CREATED](event) {
+      this.actions.create({
+        _id: event.aggregateId,
+        email: event.payload.email,
+        username: event.payload.username,
+        createdAt: event.payload.createdAt,
+      });
     },
-    "news/created": function(/* event */) {
-      // this.logger.info("ok...", event.type);
-    }
+    [eventUser.types.DELETED](event) {
+      this.actions.remove(event.aggregateId);
+    },
   },
 
   /**
    * Methods
    */
   methods: {},
+
+  entityCreated(json) {
+    this.broker.emit(`view-model.${this.name}.created`, json);
+  },
+
+  entityUpdated(json) {
+    this.broker.emit(`view-model.${this.name}.updated`, json);
+  },
+
+  entityRemoved(json) {
+    this.broker.emit(`view-model.${this.name}.removed`, json);
+  },
 
   /**
    * Service created lifecycle event handler
@@ -72,5 +84,5 @@ module.exports = {
   /**
    * Service stopped lifecycle event handler
    */
-  stopped() {}
+  stopped() {},
 };

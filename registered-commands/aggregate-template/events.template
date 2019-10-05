@@ -1,0 +1,31 @@
+const CREATED = "aggregate.{{aggregateName}}.created";
+const DELETED = "aggregate.{{aggregateName}}.deleted";
+
+function {{camelCaseName}}CreatedEvent(title, userId, createdAt) {
+  return {
+    type: CREATED,
+    payload: {
+      title,
+      createdAt,
+      createdBy: userId,
+    },
+  };
+}
+
+function {{camelCaseName}}DeletedEvent(removedAt) {
+  return {
+    type: DELETED,
+    payload: {
+      removedAt,
+    },
+  };
+}
+
+module.exports = {
+  types: {
+    CREATED,
+    DELETED,
+  },
+  {{camelCaseName}}CreatedEvent,
+  {{camelCaseName}}DeletedEvent,
+};

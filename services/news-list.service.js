@@ -1,5 +1,6 @@
 const DbService = require("moleculer-db");
-const { eventTypes: eventNews } = require("../aggregates/news");
+
+const { events: eventNews } = require("../aggregates/news");
 
 module.exports = {
   name: "news-list",
@@ -8,6 +9,9 @@ module.exports = {
 
   adapter: new DbService.MemoryAdapter({ filename: "./data/news-list.nedb" }),
 
+  metadata: {
+    viewModel: true,
+  },
   /**
    *
    * Service settings
@@ -23,57 +27,78 @@ module.exports = {
    * Actions
    */
   actions: {
-    /**
-     * Welcome a username
-     *
-     * @param {String} name - User name
-     */
-    async mapReq(ctx) {
-      this.logger.info(ctx.params, ctx.query);
-      return { data: await this.actions.find() };
+    incrVotes(ctx) {
+      return this.adapter
+        .updateById(ctx.params.aggregateId, {
+          $inc: { votes: 1 },
+        })
+        .then(doc => this.transformDocuments(ctx, {}, doc))
+        .then(json =>
+          this.entityChanged("created", json, ctx).then(() => json)
+        );
     },
-
-    async upvote(ctx) {
-      return this.adapter.updateById(ctx.params.aggregateId, {
-        $inc: { votes: 1 }
-      });
+    decrVotes(ctx) {
+      return this.adapter
+        .updateById(ctx.params.aggregateId, {
+          $inc: { votes: -1 },
+        })
+        .then(doc => this.transformDocuments(ctx, {}, doc))
+        .then(json =>
+          this.entityChanged("created", json, ctx).then(() => json)
+        );
     },
-    async dispose() {
+    incrComment(ctx) {
+      return this.adapter
+        .updateById(ctx.params.aggregateId, {
+          $inc: { comments: 1 },
+        })
+        .then(doc => this.transformDocuments(ctx, {}, doc))
+        .then(json =>
+          this.entityChanged("created", json, ctx).then(() => json)
+        );
+    },
+    decrComment(ctx) {
+      return this.adapter
+        .updateById(ctx.params.aggregateId, {
+          $inc: { comments: -1 },
+        })
+        .then(doc => this.transformDocuments(ctx, {}, doc))
+        .then(json =>
+          this.entityChanged("created", json, ctx).then(() => json)
+        );
+    },
+    dispose() {
       return this.adapter.removeMany({});
-    }
+    },
   },
 
   /**
    * Events
    */
   events: {
-    [eventNews.CREATED](event) {
+    [eventNews.types.CREATED](event) {
       this.actions.create({
         _id: event.aggregateId,
         title: event.payload.title,
         votes: 0,
-        comments: 0
+        comments: 0,
       });
     },
-    [eventNews.DELETED](event) {
-      this.actions.remove(event.aggregateId);
+    [eventNews.types.DELETED](event) {
+      this.actions.remove({ id: event.aggregateId });
     },
-    async [eventNews.UPVOTED](event) {
-      // const view = await this.actions.get({ id: event.aggregateId });
-
-      // await this.actions.patch(event.aggregateId, {
-      //   ...view,
-      //   voted: view.voted + 1
-      // });
-      return this.actions.upvote(event);
+    [eventNews.types.UPVOTED](event) {
+      this.actions.incrVotes(event);
     },
-    async [eventNews.COMMENT_CREATED]() {
-      // const view = await app.service("news-list").get(event.aggregateId);
-      // await app.service("news-list").patch(event.aggregateId, {
-      //   ...view,
-      //   comments: view.comments + 1
-      // });
-    }
+    [eventNews.types.UNVOTED](event) {
+      this.actions.decrVotes(event);
+    },
+    [eventNews.types.COMMENT_CREATED](event) {
+      this.actions.incrComment(event);
+    },
+    [eventNews.types.COMMENT_REMOVED](event) {
+      this.actions.decrComment(event);
+    },
   },
 
   /**
@@ -81,6 +106,17 @@ module.exports = {
    */
   methods: {},
 
+  entityCreated(json) {
+    this.broker.emit(`view-model.${this.name}.created`, json);
+  },
+
+  entityUpdated(json) {
+    this.broker.emit(`view-model.${this.name}.updated`, json);
+  },
+
+  entityRemoved(json) {
+    this.broker.emit(`view-model.${this.name}.removed`, json);
+  },
   /**
    * Service created lifecycle event handler
    */
@@ -94,5 +130,5 @@ module.exports = {
   /**
    * Service stopped lifecycle event handler
    */
-  stopped() {}
+  stopped() {},
 };

@@ -1,0 +1,42 @@
+const validate = require("../validation");
+const {
+  {{camelCaseName}}CreatedEvent,
+  {{camelCaseName}}DeletedEvent,
+} = require("./events");
+
+function create{{camelCaseName}}(state, command) {
+  validate(state, { createdAt: { type: "forbidden" } });
+  validate(command, {
+    payload: {
+      type: "object",
+      props: {
+        title: { type: "string" },
+        userId: { type: "string" },
+      },
+    },
+  });
+
+  const { title, userId } = command.payload;
+
+  return {{camelCaseName}}CreatedEvent(title, userId, Date.now());
+}
+
+function delete{{camelCaseName}}(state) {
+  validate(state, {
+    createdAt: {
+      type: "any",
+      messages: { required: "Aggregate does not exist" },
+    },
+    removedAt: {
+      type: "forbidden",
+      messages: { forbidden: "Aggregate is already deleted" },
+    },
+  });
+
+  return {{camelCaseName}}DeletedEvent(Date.now());
+}
+
+module.exports = {
+  create{{camelCaseName}},
+  delete{{camelCaseName}},
+};

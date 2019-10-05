@@ -30,8 +30,8 @@ function executeUpVoted(broker, aggregateId, aggregateName, userId) {
     aggregateName,
     type: "upvoteNews",
     payload: {
-      userId
-    }
+      userId,
+    },
   });
 }
 
@@ -41,8 +41,8 @@ function executeUnVoted(broker, aggregateId, aggregateName, userId) {
     aggregateName,
     type: "unvoteNews",
     payload: {
-      userId
-    }
+      userId,
+    },
   });
 }
 
@@ -54,8 +54,8 @@ function executeComment(broker, aggregateId, aggregateName, commentId, userId) {
     payload: {
       commentId,
       comment: faker.random.words(25),
-      userId
-    }
+      userId,
+    },
   });
 }
 
@@ -65,8 +65,8 @@ function executeRemoveComment(broker, aggregateId, aggregateName, commentId) {
     aggregateName,
     type: "removeComment",
     payload: {
-      commentId
-    }
+      commentId,
+    },
   });
 }
 
@@ -77,8 +77,8 @@ function createUser(broker, aggregateId, aggregateName) {
     type: "createUser",
     payload: {
       username: faker.internet.userName(),
-      email: faker.internet.email()
-    }
+      email: faker.internet.email(),
+    },
   });
 }
 
@@ -103,8 +103,8 @@ async function* generateNewsAggregate(broker, numCommands, delayMs) {
       payload: {
         title: faker.lorem.sentence(),
         userId: uuid().toString(),
-        text: faker.lorem.paragraph()
-      }
+        text: faker.lorem.paragraph(),
+      },
     })
     .catch(console.error);
 
@@ -193,14 +193,14 @@ module.exports = {
       un_voted: 0,
       comment: 0,
       remove_comment: 0,
-      user_created: 0
+      user_created: 0,
     };
     const hrstart = process.hrtime();
     // eslint-disable-next-line no-restricted-syntax
     for await (const itemName of generateNewsAggregate(
       broker,
       numCommands,
-      2
+      1
     )) {
       stats[itemName]++;
     }
@@ -215,5 +215,5 @@ module.exports = {
           ${stats.remove_comment} comments removed,
           ${count} → in ${hrend[0]}s ${hrend[1] / 1000000}ms`
     );
-  }
+  },
 };

@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing aggregate commands in isolation should createNews command return an NewsCreatedEvent 1`] = `
+Object {
+  "payload": Object {
+    "createdAt": 1557831718135,
+    "createdBy": "user-id-1",
+    "link": "",
+    "text": "Asperiores nam tempora qui et provident temporibus illo et fugit.",
+    "title": "Title news",
+    "votes": Array [],
+  },
+  "type": "aggregate.news.created",
+}
+`;

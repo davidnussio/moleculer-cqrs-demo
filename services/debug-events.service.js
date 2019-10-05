@@ -1,5 +1,5 @@
 module.exports = {
-  name: "events",
+  name: "debug-events",
 
   /**
    *
@@ -23,21 +23,21 @@ module.exports = {
      */
     welcome() {
       return `Welcome, events`;
-    }
+    },
   },
 
   /**
    * Events
    */
   events: {
-    "*": function(payload) {
+    "xxx*": function(payload) {
       this.logger.info(
         "Event received type:",
         payload.type,
         " payload size: ",
         JSON.stringify(payload, "", 0).length
       );
-    }
+    },
   },
 
   /**
@@ -58,5 +58,5 @@ module.exports = {
   /**
    * Service stopped lifecycle event handler
    */
-  stopped() {}
+  stopped() {},
 };

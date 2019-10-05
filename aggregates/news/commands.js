@@ -1,12 +1,12 @@
 const validate = require("../validation");
 const {
-  CREATED,
-  DELETED,
-  UPVOTED,
-  UNVOTED,
-  COMMENT_CREATED,
-  COMMENT_REMOVED
-} = require("./event_types");
+  NewsCreatedEvent,
+  NewsDeletedEvent,
+  NewsUpvotedEvent,
+  NewsUnvotedEvent,
+  NewsCommentCreatedEvent,
+  NewsCommentDeletedEvent,
+} = require("./events");
 
 function createNews(state, command) {
   validate(state, { createdAt: { type: "forbidden" } });
@@ -15,134 +15,109 @@ function createNews(state, command) {
       type: "object",
       props: {
         title: { type: "string" },
-        userId: { type: "string" }
-      }
-    }
+        text: { type: "string" },
+        userId: { type: "string" },
+      },
+    },
   });
 
-  const { title, userId, text, link = "", voted = [] } = command.payload;
+  const { title, userId, text, link = "", votes = [] } = command.payload;
 
-  return {
-    type: CREATED,
-    payload: {
-      title,
-      text,
-      link,
-      userId,
-      voted,
-      createdAt: Date.now(),
-      createdBy: userId
-    }
-  };
+  return NewsCreatedEvent(title, text, link, votes, userId, Date.now());
 }
 
 function deleteNews(state) {
   validate(state, {
     createdAt: {
       type: "any",
-      messages: { required: "Aggregate does not exist" }
-    }
+      messages: { required: "Aggregate does not exist" },
+    },
   });
   validate(state, {
     removedAt: {
       type: "forbidden",
-      messages: { forbidden: "Aggregate is already deleted" }
-    }
+      messages: { forbidden: "Aggregate is already deleted" },
+    },
   });
 
-  return {
-    type: DELETED,
-    payload: {
-      removedAt: Date.now()
-    }
-  };
+  return NewsDeletedEvent(Date.now());
 }
 
 function upvoteNews(state, command) {
   validate(state, {
     createdAt: {
       type: "any",
-      messages: { required: "Aggregate does not exist" }
-    }
+      messages: { required: "Aggregate does not exist" },
+    },
   });
   validate(state, {
     removedAt: {
       type: "forbidden",
-      messages: { forbidden: "Aggregate is already deleted" }
-    }
+      messages: { forbidden: "Aggregate is already deleted" },
+    },
   });
   validate(command, {
     payload: {
       type: "object",
       props: {
-        userId: { type: "any" }
-      }
-    }
+        userId: { type: "any" },
+      },
+    },
   });
 
   const { userId } = command.payload;
 
-  return {
-    type: UPVOTED,
-    payload: {
-      userId
-    }
-  };
+  return NewsUpvotedEvent(userId);
 }
 
 function unvoteNews(state, command) {
   validate(state, {
     createdAt: {
       type: "any",
-      messages: { required: "Aggregate does not exist" }
-    }
+      messages: { required: "Aggregate does not exist" },
+    },
   });
   validate(state, {
     removedAt: {
       type: "forbidden",
-      messages: { forbidden: "Aggregate is already deleted" }
-    }
+      messages: { forbidden: "Aggregate is already deleted" },
+    },
   });
 
   validate(command, {
     payload: {
       type: "object",
       props: {
-        userId: { type: "any" }
-      }
-    }
+        userId: { type: "any" },
+      },
+    },
   });
 
   const { userId } = command.payload;
 
   validate(state, {
-    voted: {
+    votes: {
       type: "array",
       contains: userId,
-      messages: { contains: "User does not exit" }
-    }
+      messages: { contains: "User does not exit" },
+    },
   });
 
-  return {
-    type: UNVOTED,
-    payload: {
-      userId
-    }
-  };
+  return NewsUnvotedEvent(userId);
 }
 
 function createComment(state, command) {
   validate(state, {
     createdAt: {
       type: "any",
-      messages: { required: "Aggregate does not exist" }
-    }
+      messages: { required: "Aggregate does not exist" },
+    },
   });
   validate(state, {
     removedAt: {
       type: "forbidden",
-      messages: { forbidden: "Aggregate is already deleted" }
-    }
+      messages: { forbidden: "Aggregate is already deleted" },
+    },
   });
   validate(command, {
     payload: {
@@ -150,46 +125,36 @@ function createComment(state, command) {
       props: {
         commentId: { type: "any" },
         comment: { type: "string" },
-        userId: { type: "any" }
-      }
-    }
+        userId: { type: "any" },
+      },
+    },
   });
-
-  // logger.warn(command.payload);
 
   const { comment, userId, commentId } = command.payload;
 
-  return {
-    type: COMMENT_CREATED,
-    payload: {
-      commentId,
-      comment,
-      createdAt: Date.now(),
-      createdBy: userId
-    }
-  };
+  return NewsCommentCreatedEvent(commentId, comment, userId, Date.now());
 }
 
 function removeComment(state, command) {
   validate(state, {
     createdAt: {
       type: "any",
-      messages: { required: "Aggregate does not exist" }
-    }
+      messages: { required: "Aggregate does not exist" },
+    },
   });
   validate(state, {
     removedAt: {
       type: "forbidden",
-      messages: { forbidden: "Aggregate is already deleted" }
-    }
+      messages: { forbidden: "Aggregate is already deleted" },
+    },
   });
   validate(command, {
     payload: {
       type: "object",
       props: {
-        commentId: { type: "any" }
-      }
-    }
+        commentId: { type: "any" },
+      },
+    },
   });
 
   const { commentId } = command.payload;
@@ -198,16 +163,11 @@ function removeComment(state, command) {
     comments: {
       type: "object",
       props: { [commentId]: { type: "object" } },
-      messages: { [commentId]: "Comment does not exist" }
-    }
+      messages: { [commentId]: "Comment does not exist" },
+    },
   });
 
-  return {
-    type: COMMENT_REMOVED,
-    payload: {
-      commentId
-    }
-  };
+  return NewsCommentDeletedEvent(commentId);
 }
 
 module.exports = {
@@ -220,5 +180,5 @@ module.exports = {
 
   updateComment: () => {
     throw new Error("Not implemented");
-  }
+  },
 };

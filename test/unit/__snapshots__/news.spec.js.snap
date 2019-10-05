@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`News service should 3 1`] = `
+Object {
+  "comments": Object {
+    "comment-1": Object {
+      "comment": "Comment comment...",
+      "createdAt": 1557831718135,
+      "createdBy": "user-2",
+    },
+  },
+  "createdAt": 1557831718135,
+  "createdBy": "user-1",
+  "link": "",
+  "text": "Text text...",
+  "title": "Title...",
+  "votes": Array [
+    "user-2",
+  ],
+}
+`;
