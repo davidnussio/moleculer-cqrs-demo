@@ -1,4 +1,7 @@
 /* eslint-disable global-require */
+const {
+  Errors: { MoleculerClientError, MoleculerServerError },
+} = require("moleculer");
 const commandHandler = require("resolve-command").default;
 const createEsStorage = require("resolve-storage-lite").default;
 // const createSnapshotAdapter = require("resolve-snapshot-lite").default;
@@ -52,47 +55,60 @@ module.exports = function CQRSEventSource({
     },
     actions: {
       command: {
-        params: { aggregateId: "any" },
+        params: {
+          aggregateId: "any",
+          type: "string",
+          payload: "object",
+        },
         async handler(ctx) {
-          if (!this.aggregate) {
-            return "Aggregate is not configurated, command action is disabled!";
-          }
+          const { aggregateId, type } = ctx.params;
           try {
-            this.logger.info(
-              `AggregateName: ${this.aggregateName} → ${ctx.params.aggregateId} → ${ctx.params.type}`
+            if (!this.aggregate) {
+              throw new MoleculerClientError(
+                `Aggregate '${this.aggregateName}' is not configurated, command action is disabled!`
+              );
+            }
+            this.logger.debug(
+              `AggregateName: ${this.aggregateName} → ${aggregateId} → ${ctx.params.type}`
             );
-            await this.commandHandler(ctx.params);
+            await this.commandHandler({
+              ...ctx.params,
+              aggregateName: this.aggregateName,
+            });
           } catch (e) {
             this.logger.error(e.message, ctx.params);
+            throw new MoleculerClientError(
+              `Aggregate command (id:${aggregateId}) '${this.aggregateName}.${type}' failed: ${e.message}`
+            );
           }
-          return `Command handler ${ctx.params.aggregateId} → ${this.aggregateName}`;
+          return {
+            status: true,
+            aggregateName: this.aggregateName,
+            aggregateId,
+          };
         },
       },
       "read-model": {
-        params: { aggregateId: "any" },
+        params: {
+          aggregateId: "any",
+          finishTime: { type: "number", optional: true },
+        },
         async handler(ctx) {
           if (!this.aggregate) {
             return "Aggregate is not configurated, read-model action is disabled!";
           }
           const hrstart = process.hrtime();
-          const { aggregateId, payload = false, finishTime } = ctx.params;
+          const { aggregateId, finishTime } = ctx.params;
 
           this.logger.info(aggregateId, ctx.params);
 
           this.logger.info(
-            `Load event history for aggregate '${this.aggregateName}' with aggregateId '${aggregateId}'`
-          );
-
-          this.logger.info(
-            "Options: payload=%s, finishTime=%s",
-            payload,
-            finishTime
+            `Load event history for aggregate '${this.aggregateName}' with aggregateId '${aggregateId}', finishTime {finishTime}`
           );
 
           const eventFilter = {
-            // eventTypes: ["news/created"] // Or null to load ALL event types
-            aggregateIds: [aggregateId], // Or null to load ALL aggregate ids
-            finishTime, // Or null to load events to current time
+            aggregateIds: [aggregateId],
+            finishTime,
           };
 
           const result = await this.materializeReadModelState(eventFilter);
@@ -213,7 +229,7 @@ module.exports = function CQRSEventSource({
               return this.broker.call(`${viewModel}.dispose`).catch(e => {
                 if (e.code !== 404) {
                   this.logger.error(e);
-                  // TODO: throw an error?
+                  throw new MoleculerServerError(e.message);
                 }
               });
             })

@@ -14,7 +14,6 @@ module.exports = {
         path: "/api",
         aliases: {
           "POST command-handler": async function(req, res) {
-            console.log(req.$params);
             await this.broker.call(
               `${req.$params.aggregateName}.command`,
               req.$params

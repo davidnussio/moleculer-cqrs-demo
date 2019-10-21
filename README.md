@@ -16,3 +16,15 @@ GET localhost:3000/api/news/read-model aggregateId=873b97b6-2db9-4b1d-8938-6b23a
 - `npm test`: Run tests & generate coverage report
 - `npm run dc:up`: Start the stack with Docker Compose
 - `npm run dc:down`: Stop the stack with Docker Compose
+
+## Testing CQRS module
+
+### command
+
+### replay
+
+- Testing emit and broadcast event
+
+### history
+
+### read-model
