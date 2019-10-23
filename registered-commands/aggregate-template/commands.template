@@ -2,6 +2,7 @@ const validate = require("../validation");
 const {
   {{camelCaseName}}CreatedEvent,
   {{camelCaseName}}DeletedEvent,
+  TestGenericEvent
 } = require("./events");
 
 function create{{camelCaseName}}(state, command) {
@@ -36,7 +37,20 @@ function delete{{camelCaseName}}(state) {
   return {{camelCaseName}}DeletedEvent(Date.now());
 }
 
+function genericCommandTest(state, command) {
+  validate(state, {
+    deleted: {
+      type: "forbidden",
+      messages: { forbidden: "Aggregate is already deleted" },
+    },
+  });
+
+  return TestGenericEvent(command.payload);
+}
+
+
 module.exports = {
   create{{camelCaseName}},
   delete{{camelCaseName}},
+  genericCommand,
 };

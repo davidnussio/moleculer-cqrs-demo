@@ -26,6 +26,11 @@ function getRenderedTemplatePath(values, templateName) {
         values.serviceFolder,
         `${values.viewModelName}.service.js`
       );
+    case "cqrs-service":
+      return path.join(
+        values.serviceFolder,
+        `${values.aggregateName}.service.js`
+      );
     case "tests":
       return path.join(
         values.newAggregatePath,

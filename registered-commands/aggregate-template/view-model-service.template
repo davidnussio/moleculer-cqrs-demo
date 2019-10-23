@@ -2,11 +2,11 @@ const DbService = require("moleculer-db");
 const { events: event{{camelCaseName}} } = require("../{{newAggregatePath}}");
 
 module.exports = {
-  name: "{{serviceName}}",
+  name: "{{viewModelName}}",
 
   mixins: [DbService],
 
-  adapter: new DbService.MemoryAdapter({ filename: ":memory:" }),
+  adapter: new DbService.MemoryAdapter(),
 
   /**
    *
@@ -39,7 +39,7 @@ module.exports = {
       });
     },
     [event{{camelCaseName}}.types.DELETED](event) {
-      this.actions.remove(event.aggregateId);
+      this.actions.remove({ id: event.aggregateId });
     },
   },
 
