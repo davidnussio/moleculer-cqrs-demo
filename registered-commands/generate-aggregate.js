@@ -184,7 +184,6 @@ module.exports = {
   command: "aggregate create",
   describe: "Create an aggregate director",
   action(broker, opts) {
-    console.log(`Available modules: ${templates.join(", ")}`);
     return addAggeregate(opts.name);
   },
 };
