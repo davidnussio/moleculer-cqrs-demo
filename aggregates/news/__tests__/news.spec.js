@@ -1,4 +1,4 @@
-const CQRSFixture = require("../../cqrs-fixture");
+const { CQRSFixture } = require("moleculer-cqrs");
 
 const aggregate = require("..");
 

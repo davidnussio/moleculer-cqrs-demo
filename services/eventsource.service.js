@@ -1,5 +1,5 @@
+const CQRSEventSource = require("moleculer-cqrs");
 const EventSourceStorage = require("../event-source-storage");
-const CQRSEventSource = require("../mixins/cqrs-event-source");
 
 // call eventsource.replay '{"viewModels": ["news-list", "user-list"]}'
 module.exports = {

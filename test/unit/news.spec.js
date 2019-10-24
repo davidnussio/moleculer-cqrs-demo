@@ -12,7 +12,7 @@ const inmemoryStorage = createEsStorage({
 });
 
 describe("News service", () => {
-  const broker = new ServiceBroker({ logger: console });
+  const broker = new ServiceBroker({ logger: false });
   broker.createService(NewsService, { storage: inmemoryStorage });
 
   beforeEach(() => broker.start());
