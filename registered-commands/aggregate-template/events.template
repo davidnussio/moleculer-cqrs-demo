@@ -24,7 +24,7 @@ function {{camelCaseName}}DeletedEvent(removedAt) {
 
 function {{camelCaseName}}GenericEvent(payload) {
   return {
-    type: GENERIC_EVENT,
+    type: GENERIC,
     payload,
   };
 }

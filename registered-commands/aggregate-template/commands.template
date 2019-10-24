@@ -37,7 +37,7 @@ function delete{{camelCaseName}}(state) {
   return {{camelCaseName}}DeletedEvent(Date.now());
 }
 
-function genericCommandTest(state, command) {
+function genericCommand(state, command) {
   validate(state, {
     deleted: {
       type: "forbidden",
