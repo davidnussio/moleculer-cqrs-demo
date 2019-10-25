@@ -1,9 +1,5 @@
 const {
-  types: {
-    CREATED,
-    DELETED,
-    GENERIC
-  },
+  types: { CREATED, DELETED, GENERIC },
 } = require("./events");
 
 module.exports = {

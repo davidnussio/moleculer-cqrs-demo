@@ -1,8 +1,8 @@
 const DbService = require("moleculer-db");
-const { events: event{{camelCaseName}} } = require("../{{newAggregatePath}}");
+const { events: eventTodo } = require("../aggregates/todo");
 
 module.exports = {
-  name: "{{viewModelName}}",
+  name: "todo-list",
 
   mixins: [DbService],
 
@@ -32,13 +32,13 @@ module.exports = {
    * Events
    */
   events: {
-    [event{{camelCaseName}}.types.CREATED](event) {
+    [eventTodo.types.CREATED](event) {
       this.actions.create({
         _id: event.aggregateId,
         title: event.payload.title,
       });
     },
-    [event{{camelCaseName}}.types.DELETED](event) {
+    [eventTodo.types.DELETED](event) {
       this.actions.remove({ id: event.aggregateId });
     },
   },

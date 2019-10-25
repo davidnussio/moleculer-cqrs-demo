@@ -3,15 +3,15 @@ const commands = require("./commands");
 const events = require("./events");
 
 /**
- * {{aggregateName}} aggregate
+ * todo aggregate
  */
 
 module.exports = {
-  name: "{{aggregateName}}",
+  name: "todo",
   projection,
   commands,
   events,
   invariantHash: null,
   serializeState: state => JSON.stringify(state),
   deserializeState: serializedState => JSON.parse(serializedState),
-}
+};

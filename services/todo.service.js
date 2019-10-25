@@ -1,9 +1,9 @@
+const CQRSEventSource = require("moleculer-cqrs");
 const EventSourceStorage = require("../event-source-storage");
-const CQRSEventSource = require("../mixins/cqrs-event-source");
-const aggregate = require("../{{newAggregatePath}}");
+const aggregate = require("../aggregates/todo");
 
 module.exports = {
-  name: "{{aggregateName}}",
+  name: "todo",
 
   mixins: [CQRSEventSource({ aggregate })],
 
